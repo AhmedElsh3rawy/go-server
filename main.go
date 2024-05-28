@@ -26,7 +26,7 @@ func main() {
 	router.HandleFunc("/", homeHandler)
 	// handle user routes
 	router.HandleFunc("/users", handlers.GetUsers)
-	router.HandleFunc("/users/{id}", handlers.GetUserById)
+	router.HandleFunc("/users/{id}", handlers.FindUserById)
 
 	// Start the server on port 8080
 	PORT := ":" + os.Getenv("PORT")
