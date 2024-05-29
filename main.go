@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 
-	"main/handlers"
+	"main/handler"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,8 +25,9 @@ func main() {
 
 	router.HandleFunc("/", homeHandler)
 	// handle user routes
-	router.HandleFunc("/users", handlers.GetUsers)
-	router.HandleFunc("/users/{id}", handlers.FindUserById)
+	router.HandleFunc("/users", handler.GetUsers)
+	router.HandleFunc("/users/{id}", handler.GetUserById)
+	router.HandleFunc("POST /users", handler.AddUser)
 
 	// Start the server on port 8080
 	PORT := ":" + os.Getenv("PORT")
