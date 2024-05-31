@@ -20,10 +20,19 @@ func main() {
 	// handle user routes
 	router.HandleFunc("/users", handler.AddUser).Methods("POST")
 	router.HandleFunc("/users", handler.GetUsers).Methods("GET")
-	router.HandleFunc("/users/{id}", handler.GetUserById)
+	router.HandleFunc("/users/{id}", handler.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/users/{id}", handler.GetUserById).Methods("GET")
 
 	// Start the server on port 8080
 	fmt.Println("Server starting on localhost:8080")
+	fmt.Println(`
+  ░██████╗░░█████╗░  ░█████╗░██████╗░██╗
+  ██╔════╝░██╔══██╗  ██╔══██╗██╔══██╗██║
+  ██║░░██╗░██║░░██║  ███████║██████╔╝██║
+  ██║░░╚██╗██║░░██║  ██╔══██║██╔═══╝░██║
+  ╚██████╔╝╚█████╔╝  ██║░░██║██║░░░░░██║
+  ░╚═════╝░░╚════╝░  ╚═╝░░╚═╝╚═╝░░░░░╚═╝
+    `)
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		panic(err)
 	}

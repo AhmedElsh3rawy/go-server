@@ -51,4 +51,19 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {}
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {}
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		log.Fatal("Error while converting")
+	}
+
+	for i, user := range users {
+		if user.ID == id {
+			users = append(users[:i], users[i+1:]...)
+			fmt.Fprintf(w, "Deleted")
+			return
+		}
+	}
+	fmt.Fprintf(w, "Not found")
+}
