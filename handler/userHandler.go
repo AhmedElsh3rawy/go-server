@@ -12,9 +12,11 @@ import (
 	"main/model"
 )
 
+var users []model.User = model.Users
+
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(model.Users)
+	json.NewEncoder(w).Encode(users)
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error while converting")
 	}
 
-	for _, user := range model.Users {
+	for _, user := range users {
 		if user.ID == id {
 
 			w.Header().Set("Content-Type", "application/json")
@@ -42,7 +44,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	model.Users = append(model.Users, newUser)
+	users = append(users, newUser)
 	w.WriteHeader(http.StatusOK) // Send a success status code
 	w.Write([]byte("User added successfully"))
 }

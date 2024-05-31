@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 
 	"main/handler"
 )
@@ -18,21 +15,16 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	router.HandleFunc("/", homeHandler)
 	// handle user routes
-	router.HandleFunc("/users", handler.GetUsers)
+	router.HandleFunc("/users", handler.AddUser).Methods("POST")
+	router.HandleFunc("/users", handler.GetUsers).Methods("GET")
 	router.HandleFunc("/users/{id}", handler.GetUserById)
-	router.HandleFunc("POST /users", handler.AddUser)
 
 	// Start the server on port 8080
-	PORT := ":" + os.Getenv("PORT")
-	fmt.Printf("Server starting on localhost%s\n", PORT)
-	if err := http.ListenAndServe(PORT, router); err != nil {
+	fmt.Println("Server starting on localhost:8080")
+	if err := http.ListenAndServe(":8080", router); err != nil {
 		panic(err)
 	}
 }
