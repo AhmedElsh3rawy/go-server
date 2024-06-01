@@ -24,7 +24,7 @@ func main() {
 	router.HandleFunc("/users/{id}", handler.GetUserById).Methods("GET")
 
 	// Start the server on port 8080
-	fmt.Println("[server]: listening on localhost:8080")
+	fmt.Println("[server]: starting on localhost:8080")
 	fmt.Println(`
     ░██████╗░░█████╗░  ░█████╗░██████╗░██╗
     ██╔════╝░██╔══██╗  ██╔══██╗██╔══██╗██║
