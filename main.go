@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/AhmedElsh3rawy/go-server/database"
+	"github.com/AhmedElsh3rawy/go-server/handler"
 	"github.com/AhmedElsh3rawy/go-server/middleware"
 )
 
@@ -21,6 +22,8 @@ func main() {
 
 	stack := middleware.CreateStack(
 		middleware.Logging)
+
+	router.HandleFunc("GET /users", handler.GetUsers)
 
 	server := http.Server{
 		Addr:    ":8080",
