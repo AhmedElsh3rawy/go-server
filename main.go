@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AhmedElsh3rawy/go-server/database"
 	"github.com/AhmedElsh3rawy/go-server/middleware"
 )
 
@@ -12,6 +13,8 @@ func getHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	database.ConnectDatabase()
+
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /", getHello)
@@ -38,4 +41,5 @@ func main() {
 		fmt.Printf("Error starting server: %v\n", err)
 		return
 	}
+	// database.CloseDatabase()
 }
