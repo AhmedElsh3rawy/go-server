@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/AhmedElsh3rawy/go-server/middleware"
 )
 
 func getHello(w http.ResponseWriter, r *http.Request) {
@@ -14,12 +16,14 @@ func main() {
 
 	router.HandleFunc("GET /", getHello)
 
+	stack := middleware.CreateStack(
+		middleware.Logging)
+
 	server := http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: stack(router),
 	}
 
-	// Start the server on port 8080
 	fmt.Println("[server]: starting on localhost:8080")
 	fmt.Println(`
     ░██████╗░░█████╗░  ░█████╗░██████╗░██╗
