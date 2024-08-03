@@ -49,7 +49,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {}
 // get single user
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	idParam := r.PathValue("id")
