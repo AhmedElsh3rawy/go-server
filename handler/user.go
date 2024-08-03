@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/AhmedElsh3rawy/go-server/database"
 )
@@ -13,6 +15,7 @@ type User struct {
 	Email    string `json:"email"`
 }
 
+// get users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var users []User
 	db := database.Db
@@ -47,9 +50,33 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {}
+// get single user
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	idParam := r.PathValue("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Printf("Error while converting string to number: %v", err)
+		return
+	}
 
-func AddUser(w http.ResponseWriter, r *http.Request) {}
+	db := database.Db
+	var user User
+	e := db.QueryRow("SELECT username, email FROM users WHERE id = $1;", id).
+		Scan(&user.Username, &user.Email)
+	if e != nil {
+		fmt.Printf("error while scannig row: %v", e)
+		return
+	}
 
+	j, err := json.Marshal(user)
+	if err != nil {
+		log.Printf("error marshalling users into json %v", err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
+
+}
 func UpdateUser(w http.ResponseWriter, r *http.Request) {}
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {}

@@ -24,6 +24,7 @@ func main() {
 		middleware.Logging)
 
 	router.HandleFunc("GET /users", handler.GetUsers)
+	router.HandleFunc("GET /users/{id}", handler.GetUser)
 
 	server := http.Server{
 		Addr:    ":8080",
