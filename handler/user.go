@@ -1,81 +1,85 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/AhmedElsh3rawy/go-server/database"
+	"github.com/AhmedElsh3rawy/go-server/users"
 )
 
 type User struct {
+	ID       int32  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
+type CreatedUser struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // get users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	var users []User
-	db := database.Db
+	ctx := context.Background()
+	db := database.ConnectDatabase()
+	queries := users.New(db)
 
-	rows, err := db.Query("SELECT username, email FROM users;")
+	users, err := queries.GetUsers(ctx)
 	if err != nil {
-		log.Printf("error querying users table %v", err)
+		http.Error(w, "Error quering database", http.StatusInternalServerError)
 		return
 	}
-	defer rows.Close()
 
-	for rows.Next() {
+	var us []User
+	for _, e := range users {
 		var u User
-		err := rows.Scan(&u.Username, &u.Email)
-		if err != nil {
-			log.Printf("error while scannig rows %v", err)
-			return
-		}
-
-		users = append(users, u)
+		u.ID = e.ID
+		u.Username = e.Username.String
+		u.Email = e.Email.String
+		us = append(us, u)
 	}
 
-	j, err := json.Marshal(users)
+	jsonData, err := json.Marshal(us)
 	if err != nil {
-		log.Printf("error marshalling users into json %v", err)
+		http.Error(w, "Error marshaling JSON", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
 
+	w.Write(jsonData)
 }
 
 // get single user
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	idParam := r.PathValue("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		fmt.Printf("Error while converting string to number: %v", err)
-		return
-	}
-
-	db := database.Db
-	var user User
-	e := db.QueryRow("SELECT username, email FROM users WHERE id = $1;", id).
-		Scan(&user.Username, &user.Email)
-	if e != nil {
-		fmt.Printf("error while scannig row: %v", e)
-		return
-	}
-
-	j, err := json.Marshal(user)
-	if err != nil {
-		log.Printf("error marshalling users into json %v", err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+	// idParam := r.PathValue("id")
+	// id, err := strconv.Atoi(idParam)
+	// if err != nil {
+	// 	fmt.Printf("Error while converting string to number: %v", err)
+	// 	return
+	// }
 
 }
+
+// add user
+func AddUser(w http.ResponseWriter, r *http.Request) {
+	var u CreatedUser
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		fmt.Println("error while decoding request body")
+		return
+	}
+
+	w.Write([]byte("User added"))
+
+}
+
+// update user
 func UpdateUser(w http.ResponseWriter, r *http.Request) {}
 
+// delete user
 func DeleteUser(w http.ResponseWriter, r *http.Request) {}
