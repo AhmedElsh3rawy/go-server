@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -94,12 +95,57 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("User added"))
+	ctx := context.Background()
+	db := database.ConnectDatabase()
+	queries := users.New(db)
+	newUser, err := queries.CreateUser(ctx, users.CreateUserParams{
+		Username: sql.NullString{String: u.Username, Valid: true},
+		Email:    sql.NullString{String: u.Email, Valid: true},
+		Password: sql.NullString{String: u.Password, Valid: true},
+	})
 
+	if err != nil {
+		http.Error(w, "Error quering database", http.StatusInternalServerError)
+		return
+	}
+
+	var nu User
+	nu.ID = newUser.ID
+	nu.Username = newUser.Username.String
+	nu.Email = newUser.Email.String
+
+	jsonData, err := json.Marshal(nu)
+	if err != nil {
+		http.Error(w, "Error marshaling JSON", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 // update user
 func UpdateUser(w http.ResponseWriter, r *http.Request) {}
 
 // delete user
-func DeleteUser(w http.ResponseWriter, r *http.Request) {}
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	idParam := r.PathValue("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Printf("Error while converting string to number: %v", err)
+		return
+	}
+
+	ctx := context.Background()
+	db := database.ConnectDatabase()
+	queries := users.New(db)
+	er := queries.DeleteUser(ctx, int32(id))
+
+	if er != nil {
+		http.Error(w, "Error quering database", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("User has been deleted"))
+
+}
