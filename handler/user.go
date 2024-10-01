@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/AhmedElsh3rawy/go-server/database"
 	"github.com/AhmedElsh3rawy/go-server/users"
@@ -50,18 +51,37 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-
 	w.Write(jsonData)
 }
 
 // get single user
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	// idParam := r.PathValue("id")
-	// id, err := strconv.Atoi(idParam)
-	// if err != nil {
-	// 	fmt.Printf("Error while converting string to number: %v", err)
-	// 	return
-	// }
+	idParam := r.PathValue("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Printf("Error while converting string to number: %v", err)
+		return
+	}
+
+	ctx := context.Background()
+	db := database.ConnectDatabase()
+	queries := users.New(db)
+	user, err := queries.GetUser(ctx, int32(id))
+
+	if err != nil {
+		http.Error(w, "Error quering database", http.StatusInternalServerError)
+		return
+	}
+
+	var u User
+	u.ID = user.ID
+	u.Username = user.Username.String
+	u.Email = user.Email.String
+
+	jsonData, err := json.Marshal(u)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 
 }
 
