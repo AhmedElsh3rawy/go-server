@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/AhmedElsh3rawy/go-server/database"
 	"github.com/AhmedElsh3rawy/go-server/handler"
 	"github.com/AhmedElsh3rawy/go-server/middleware"
+	"github.com/joho/godotenv"
 )
 
 func getHello(w http.ResponseWriter, r *http.Request) {
@@ -14,7 +15,10 @@ func getHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	database.ConnectDatabase()
+	er := godotenv.Load()
+	if er != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	router := http.NewServeMux()
 
@@ -25,6 +29,7 @@ func main() {
 
 	router.HandleFunc("GET /users", handler.GetUsers)
 	router.HandleFunc("GET /users/{id}", handler.GetUser)
+	router.HandleFunc("POST /users", handler.AddUser)
 
 	server := http.Server{
 		Addr:    ":8080",
@@ -45,5 +50,4 @@ func main() {
 		fmt.Printf("Error starting server: %v\n", err)
 		return
 	}
-	// database.CloseDatabase()
 }
