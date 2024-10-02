@@ -30,6 +30,7 @@ func main() {
 	router.HandleFunc("GET /users", handler.GetUsers)
 	router.HandleFunc("GET /users/{id}", handler.GetUser)
 	router.HandleFunc("POST /users", handler.AddUser)
+	router.HandleFunc("PATCH /users/{id}", handler.UpdateUser)
 	router.HandleFunc("DELETE /users/{id}", handler.DeleteUser)
 
 	server := http.Server{
