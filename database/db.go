@@ -9,6 +9,7 @@ import (
 )
 
 func ConnectDatabase() *sql.DB {
+	// postgresql://user:password@host:port/DB_name
 	connStr := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", connStr+"?sslmode=disable")
 
