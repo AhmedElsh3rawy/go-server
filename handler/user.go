@@ -49,14 +49,14 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		us = append(us, u)
 	}
 
-	jsonData, err := json.Marshal(us)
+	j, err := json.Marshal(us)
 	if err != nil {
 		http.Error(w, "Error marshaling JSON", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(j)
 }
 
 // get single user
@@ -83,10 +83,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	u.Username = user.Username.String
 	u.Email = user.Email.String
 
-	jsonData, err := json.Marshal(u)
+	j, err := json.Marshal(u)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(j)
 
 }
 
@@ -118,14 +118,14 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	nu.Username = newUser.Username.String
 	nu.Email = newUser.Email.String
 
-	jsonData, err := json.Marshal(nu)
+	j, err := json.Marshal(nu)
 	if err != nil {
 		http.Error(w, "Error marshaling JSON", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(j)
 }
 
 // update user
