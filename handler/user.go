@@ -24,6 +24,10 @@ type CreatedUser struct {
 	Password string `json:"password"`
 }
 
+type UpdatedUser struct {
+	Username string `json:"username"`
+}
+
 // get users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -125,7 +129,37 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // update user
-func UpdateUser(w http.ResponseWriter, r *http.Request) {}
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	idParam := r.PathValue("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Printf("Error while converting string to number: %v", err)
+		http.Error(w, "Invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var u UpdatedUser
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		fmt.Printf("Error while encoding request body %v", err)
+		return
+	}
+
+	ctx := context.Background()
+	db := database.ConnectDatabase()
+	queries := users.New(db)
+	if err := queries.UpdateUser(
+		ctx,
+		users.UpdateUserParams{
+			ID:       int32(id),
+			Username: sql.NullString{String: u.Username, Valid: true},
+		},
+	); err != nil {
+		http.Error(w, "Error quering database", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("User has been updated"))
+}
 
 // delete user
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +167,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		fmt.Printf("Error while converting string to number: %v", err)
+		http.Error(w, "Invalid id", http.StatusBadRequest)
 		return
 	}
 
